@@ -59,7 +59,7 @@ func (v *ProfileView) initialize() {
 			icon := box.Objects[0].(*widget.Icon)
 
 			if profile.Name == activeProfile {
-				label.SetText(profile.Name)
+				label.SetText(profile.Name + " (active)")
 				icon.SetResource(theme.RadioButtonCheckedIcon())
 			} else {
 				label.SetText(profile.Name)
@@ -141,19 +141,16 @@ func (v *ProfileView) Container() *fyne.Container {
 		),
 	)
 
-	// Create a list container with padding and status label
-	listContainer := container.NewVBox(
-		container.NewCenter(v.statusLabel),
-		container.NewPadded(v.profileList),
-	)
+	// Create a padded list container
+	listContainer := container.NewPadded(v.profileList)
 
 	// Combine all elements with proper spacing
 	return container.NewBorder(
-		nil,
-		buttons,
-		nil,
-		nil,
-		listContainer,
+		container.NewCenter(v.statusLabel), // Top
+		buttons,                            // Bottom
+		nil,                                // Left
+		nil,                                // Right
+		listContainer,                      // Center
 	)
 }
 

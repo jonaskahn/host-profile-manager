@@ -67,11 +67,10 @@ func (v *ManagementView) initialize() {
 
 			if profile.Name == activeProfile {
 				label.SetText(profile.Name + " (active)")
-				icon.SetResource(theme.RadioButtonCheckedIcon())
 			} else {
 				label.SetText(profile.Name)
-				icon.SetResource(theme.RadioButtonIcon())
 			}
+			icon.SetResource(theme.DocumentIcon())
 		},
 	)
 
@@ -199,19 +198,46 @@ func (v *ManagementView) handleDelete() {
 
 	dialog.ShowConfirm("Confirm", "Are you sure you want to delete this profile?",
 		func(ok bool) {
-			if ok {
+			if !ok {
+				return
+			}
+
+			// Remove the profile from the slice
+			if v.selectedIndex >= 0 && v.selectedIndex < len(v.hostsManager.Profiles) {
 				v.hostsManager.Profiles = append(v.hostsManager.Profiles[:v.selectedIndex], v.hostsManager.Profiles[v.selectedIndex+1:]...)
 				if err := v.hostsManager.SaveProfiles(); err != nil {
 					dialog.ShowError(err, v.window)
 					return
 				}
-				v.selectedProfile = nil
-				v.profileList.Refresh()
-				v.onProfileChange()
-				v.editBtn.Disable()
-				v.deleteBtn.Disable()
 			}
+
+			// Reset selection and disable buttons
+			v.selectedProfile = nil
+			v.selectedIndex = -1
+			v.editBtn.Disable()
+			v.deleteBtn.Disable()
+
+			// Clear the list selection and refresh
+			v.profileList.UnselectAll()
+			v.profileList.Refresh()
+			v.onProfileChange()
 		}, v.window)
+}
+
+func (v *ManagementView) refreshActiveStatus() {
+	activeProfile := v.hostsManager.GetActiveProfile()
+	v.profileList.Refresh()
+
+	// Update button states if a profile is selected
+	if v.selectedProfile != nil {
+		if v.selectedProfile.Name == activeProfile {
+			v.editBtn.Disable()
+			v.deleteBtn.Disable()
+		} else {
+			v.editBtn.Enable()
+			v.deleteBtn.Enable()
+		}
+	}
 }
 
 func (v *ManagementView) Container() *fyne.Container {
@@ -242,5 +268,5 @@ func (v *ManagementView) Container() *fyne.Container {
 }
 
 func (v *ManagementView) RefreshList() {
-	v.profileList.Refresh()
+	v.refreshActiveStatus()
 }

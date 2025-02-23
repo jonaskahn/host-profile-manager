@@ -64,6 +64,13 @@ func main() {
 	// Set tab location and style
 	tabs.SetTabLocation(container.TabLocationTop)
 
+	// Add tab change listener
+	tabs.OnChanged = func(tab *container.TabItem) {
+		if tab.Text == "Management" {
+			managementView.RefreshList()
+		}
+	}
+
 	// Create a container that centers the content horizontally
 	mainContent := container.NewGridWithColumns(3,
 		layout.NewSpacer(),
