@@ -6,8 +6,6 @@ A GUI tool to manage and switch between different hosts file configurations.
 https://github.com/user-attachments/assets/ce9f458e-cebe-4af6-bbf2-f5aa7d46bedf
 
 
-
-
 ## Install Requirements
 
 - Go 1.20+
